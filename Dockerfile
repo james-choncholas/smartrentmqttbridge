@@ -1,11 +1,10 @@
-FROM ubuntu:20.04
+FROM python:3-slim
 
-RUN apt-get update && \
-apt-get install -y --no-install-recommends \
-    python3 python3-pip && \
-rm -rf /var/lib/apt/lists/* && \
-pip3 install --upgrade sultan
+WORKDIR /usr/src/app
 
-RUN pip3 install -U paho-mqtt asyncio smartrent.py
-ADD ./smartrentmqttbridge.py /opt/smartrentmqttbridge.py
-ENTRYPOINT ["python3", "/opt/smartrentmqttbridge.py"]
+RUN pip install --no-cache-dir paho-mqtt asyncio smartrent.py
+
+COPY ./smartrentmqttbridge.py .
+ENTRYPOINT ["python", "-u"]
+CMD ["./smartrentmqttbridge.py"]
+
