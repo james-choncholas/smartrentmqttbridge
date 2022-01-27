@@ -28,12 +28,9 @@ TOPIC_THERM_CUR_HUMI = MQTT_TOPIC_PREFIX + '/thermostat/curhumidity' #readonly
 # single line string saves space in mqtt
 LOCK_DISCOVERY = ('{'
   ' "name":"SmartRentLock0",'
-  ' "state_topic":"' + TOPIC_LOCK + '/state"'
-  ' "command_topic":"' + TOPIC_LOCK + '/set",'
+  ' "state_topic":"' + TOPIC_LOCK + '/state",'
+  ' "command_topic":"' + TOPIC_LOCK + '/set"'
 '}')
-  #' "retain":"true",'
-  #' "optimistic":"false",'
-  #' "value_template":"{{ value }}"'
 
 # https://community.home-assistant.io/t/thermostats-climate-hvac/232340
 THERMOSTAT_DISCOVERY = ('{'
