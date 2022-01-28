@@ -1,6 +1,7 @@
 import os
 import time
 import ssl
+import websockets
 import paho.mqtt.client as mqtt
 
 import asyncio
@@ -44,10 +45,11 @@ THERMOSTAT_DISCOVERY = ('{'
   ' "temp_cmd_t":"' + TOPIC_THERM_SET_TEMP + '/set",'
   ' "temp_stat_t":"' + TOPIC_THERM_SET_TEMP + '/state",'
   ' "curr_temp_t":"' + TOPIC_THERM_CUR_TEMP + '",'
-  ' "curr_temp_tpl":"",'
   ' "min_temp":"60",'
   ' "max_temp":"85",'
   ' "temp_step":"1",'
+  ' "temp_unit":"F",'
+  ' "precision":"1.0",'
   ' "target_humidity_state_topic":"' + TOPIC_THERM_CUR_HUMI + '/state"'
 '}')
 
@@ -92,6 +94,7 @@ class SmartRentBridge:
         print("starting home assistant discovery")
         self.mqtt_client.publish("homeassistant/lock/srlock0/config", LOCK_DISCOVERY)
         self.mqtt_client.publish("homeassistant/climate/srclimate0/config", THERMOSTAT_DISCOVERY)
+        return self
 
     def on_mqtt_connect(self, client, userdata, flags, rc):
         print("Connected to MQTT broker with result code " + str(rc))
@@ -124,11 +127,11 @@ class SmartRentBridge:
                     asyncio.run(self.thermo.async_set_fan_mode(value))
             if command == "setpoint":
                     if self.thermo.get_mode() == "heat":
-                        print("setting thermostat heating setpoint to " + str(value))
-                        asyncio.run(self.thermo.async_set_heating_setpoint(int(value)))
+                        print("setting thermostat heating setpoint to " + value)
+                        asyncio.run(self.thermo.async_set_heating_setpoint(int(float(value))))
                     else:
-                        print("setting thermostat cooling setpoint to " + str(value))
-                        asyncio.run(self.thermo.async_set_cooling_setpoint(int(value)))
+                        print("setting thermostat cooling setpoint to " + value)
+                        asyncio.run(self.thermo.async_set_cooling_setpoint(int(float(value))))
             self.therm_on_evt() # update state topic
 
 
@@ -153,7 +156,15 @@ async def main():
     while True:
         await asyncio.sleep(10)
 
-try:
-    asyncio.run(main())
-except KeyboardInterrupt:
-    pass
+if __name__ == "__main__":
+    while True:
+        try:
+            asyncio.run(main())
+        except KeyboardInterrupt:
+            break
+        except websockets.exceptions.InvalidStatusCode:
+            print("websocket timeout")
+            pass
+        except:
+            print("general exception")
+            pass
