@@ -48,9 +48,9 @@ THERMOSTAT_DISCOVERY = ('{'
   ' "min_temp":"60",'
   ' "max_temp":"85",'
   ' "temp_step":"1",'
-  ' "temp_unit":"F",'
-  ' "precision":"1.0"'
+  ' "temp_unit":"F"'
 '}')
+  #' "precision":"1.0"'
   #' "target_humidity_state_topic":"' + TOPIC_THERM_CUR_HUMI + '/state"'
 
 
@@ -92,8 +92,8 @@ class SmartRentBridge:
         #self.mqtt_client.publish(MQTT_TOPIC_PREFIX + '/testdev/testcmd', "hi2")
 
         print("starting home assistant discovery")
-        self.mqtt_client.publish("homeassistant/lock/srlock0/config", LOCK_DISCOVERY)
-        self.mqtt_client.publish("homeassistant/climate/srclimate0/config", THERMOSTAT_DISCOVERY)
+        self.mqtt_client.publish("homeassistant/lock/srlock0/config", LOCK_DISCOVERY, retain=True)
+        self.mqtt_client.publish("homeassistant/climate/srclimate0/config", THERMOSTAT_DISCOVERY, retain=True)
         return self
 
     def on_mqtt_connect(self, client, userdata, flags, rc):
