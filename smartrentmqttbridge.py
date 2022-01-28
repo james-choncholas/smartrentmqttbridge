@@ -49,9 +49,9 @@ THERMOSTAT_DISCOVERY = ('{'
   ' "max_temp":"85",'
   ' "temp_step":"1",'
   ' "temp_unit":"F",'
-  ' "precision":"1.0",'
-  ' "target_humidity_state_topic":"' + TOPIC_THERM_CUR_HUMI + '/state"'
+  ' "precision":"1.0"'
 '}')
+  #' "target_humidity_state_topic":"' + TOPIC_THERM_CUR_HUMI + '/state"'
 
 
 class SmartRentBridge:
@@ -137,18 +137,18 @@ class SmartRentBridge:
 
     def therm_on_evt(self):
         print("thermostat event, publishing to mqtt")
-        self.mqtt_client.publish(TOPIC_THERM_MODE + '/state', self.thermo.get_mode())
-        self.mqtt_client.publish(TOPIC_THERM_FAN_MODE + '/state', self.thermo.get_fan_mode())
+        self.mqtt_client.publish(TOPIC_THERM_MODE + '/state', self.thermo.get_mode(), retain=True)
+        self.mqtt_client.publish(TOPIC_THERM_FAN_MODE + '/state', self.thermo.get_fan_mode(), retain=True)
         if self.thermo.get_mode() == "heat":
-            self.mqtt_client.publish(TOPIC_THERM_SET_TEMP + '/state', self.thermo.get_heating_setpoint())
+            self.mqtt_client.publish(TOPIC_THERM_SET_TEMP + '/state', self.thermo.get_heating_setpoint(), retain=True)
         else:
-            self.mqtt_client.publish(TOPIC_THERM_SET_TEMP + '/state', self.thermo.get_cooling_setpoint())
-        self.mqtt_client.publish(TOPIC_THERM_CUR_TEMP + '/state', self.thermo.get_current_temp())
-        self.mqtt_client.publish(TOPIC_THERM_CUR_HUMI + '/state', self.thermo.get_current_humidity())
+            self.mqtt_client.publish(TOPIC_THERM_SET_TEMP + '/state', self.thermo.get_cooling_setpoint(), retain=True)
+        self.mqtt_client.publish(TOPIC_THERM_CUR_TEMP + '/state', self.thermo.get_current_temp(), retain=True)
+        self.mqtt_client.publish(TOPIC_THERM_CUR_HUMI + '/state', self.thermo.get_current_humidity(), retain=True)
 
     def lock_on_evt(self):
         print("lock event, publishing to mqtt. state: " + "LOCKED" if self.lock.get_locked() else "UNLOCKED")
-        self.mqtt_client.publish(TOPIC_LOCK + '/state', "LOCKED" if self.lock.get_locked() else "UNLOCKED")
+        self.mqtt_client.publish(TOPIC_LOCK + '/state', "LOCKED" if self.lock.get_locked() else "UNLOCKED", retain=True)
 
 
 async def main():
